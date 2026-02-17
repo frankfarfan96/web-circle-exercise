@@ -4,11 +4,23 @@ import { useNavigate, useParams } from "react-router-dom";
 import Button from "../Button/Button";
 
 import styles from "./MenuItem.module.css";
+import { FaStar } from "react-icons/fa";
 
 
 const MenuItemDetails = () => {
-  // Hold a temporary value for meal until we fetch the real data. Show a loading message while it's null
   const [meal, setMeal] = useState(null);
+
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => { // To wait fetch of the meal
+  if (meal) {
+    const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    const isFav = savedFavorites.some(fav => fav.idMeal === meal.idMeal);
+    setIsFavorite(isFav);
+  }
+}, [meal]);
+
+  // Hold a temporary value for meal until we fetch the real data. Show a loading message while it's null
   // Hold a boolean value for error in case we run into an error while fetching to give the user feedback and redirect back home
   const [error, setError] = useState(false);
 
@@ -65,10 +77,36 @@ const MenuItemDetails = () => {
     }
   }
 
+  const handleFavorite = () => {
+    const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    let updatedFavorites;
+
+    if (isFavorite) { // To toggle the dish from the localStorage
+      updatedFavorites = savedFavorites.filter(fav => fav.idMeal !== meal.idMeal);
+    } else {
+      updatedFavorites = [...savedFavorites, meal];
+    }
+
+    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+    setIsFavorite(!isFavorite);
+  };
+
   return (
     <div className={styles.menuItemDetail}>
       <Button onClick={() => navigate("/")}>return Home</Button>
       <h1>{meal.strMeal}</h1>
+      <button className="btn-add-favorite" 
+              onClick={handleFavorite}>
+        {isFavorite ? 
+        <>
+          Remove Favorite <FaStar color="gold"/>
+        </> :
+        <>
+          Add Favorite <FaStar color="gray"/>
+        </>
+        }
+          
+      </button>
       <img
         src={meal.strMealThumb}
         alt={meal.strMeal}

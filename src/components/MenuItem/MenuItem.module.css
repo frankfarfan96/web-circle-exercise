@@ -10,6 +10,7 @@
   flex-direction: column; /* Arrange children in a column */
   justify-content: space-between; /* Space between content and button */
   height: 100%; /* Full height to encapsulate content and button */
+  position: relative;
 }
 
 .menuItem h3 {

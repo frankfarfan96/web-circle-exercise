@@ -9,6 +9,12 @@ import SearchField from "../components/SearchField/SearchField.jsx";
 const RestaurantView = () => {
   const [dishes, setDishes] = useState([]);
   const [searchDishes, setSearchDishes] = useState("");
+  const [isRenderingFavoriteDishes, setIsRenderingFavoriteDishes] = useState(false);
+  const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  
+  const renderFavoriteDishes = () => {
+    setIsRenderingFavoriteDishes(!isRenderingFavoriteDishes)
+  }
 
   // useDebouncedCallback takes a function as a parameter and as the second parameter
   // the number of milliseconds it should wait until it is actually called so a user
@@ -56,33 +62,63 @@ const RestaurantView = () => {
     <>
       <NavBar>
         <h1>ReDI React Restaurant</h1>
-
+        
         <SearchField
           searchDishes={searchDishes}
           setSearchDishes={setSearchDishes} />
+        <button onClick={renderFavoriteDishes} style={{width:"fit-content"}}>
+          {isRenderingFavoriteDishes? "Return to all dishes" : "See my favorite dishes"}
+        </button>
+
       </NavBar>
 
       <div className={styles.restaurantWrapper}>
         <div className={styles.menu}>
-          {dishes.length > 0 ? (
-            searchDishes ? 
-            dishes.filter((dish) => dish.strMeal?.toLowerCase().includes(searchDishes?.toLowerCase()))
-            .map((dish) => (
-              <MenuItem
-                dish={dish}
-                key={dish.idMeal}
-              />
-            ))
-            :
-            dishes.map((dish) => (
-              <MenuItem
-                dish={dish}
-                key={dish.idMeal}
-              />
-            ))
-          ) : (
-            <p>No dishes found :(</p>
-          )}
+          {isRenderingFavoriteDishes ? 
+            <>
+              {savedFavorites.length > 0 ? (
+                searchDishes ? 
+                savedFavorites.filter((dish) => dish.strMeal?.toLowerCase().includes(searchDishes?.toLowerCase()))
+                .map((dish) => (
+                  <MenuItem
+                    dish={dish}
+                    key={dish.idMeal}
+                  />
+                ))
+                :
+                savedFavorites.map((dish) => (
+                  <MenuItem
+                    dish={dish}
+                    key={dish.idMeal}
+                  />
+                ))
+              ) : (
+                <p>No favorite dishes found :(</p>
+              )}
+            </> :
+            <>
+              {dishes.length > 0 ? (
+                searchDishes ? 
+                dishes.filter((dish) => dish.strMeal?.toLowerCase().includes(searchDishes?.toLowerCase()))
+                .map((dish) => (
+                  <MenuItem
+                    dish={dish}
+                    key={dish.idMeal}
+                  />
+                ))
+                :
+                dishes.map((dish) => (
+                  <MenuItem
+                    dish={dish}
+                    key={dish.idMeal}
+                  />
+                ))
+              ) : (
+                <p>No dishes found :(</p>
+              )}
+            </>
+        }
+
         </div>
       </div>
     </>
